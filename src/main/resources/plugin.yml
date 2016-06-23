@@ -1,0 +1,8 @@
+name: TNTRun
+main: com.mcndsj.TNTRun
+depend: [GameEvent, GameServerStatusSync]
+version: 0.0.1-SNAPSHOT
+commands:
+  set:
+    description: Main command!
+    aliases: [set]
