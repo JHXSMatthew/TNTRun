@@ -122,11 +122,9 @@ public class Game implements IReceiver{
         switch (state){
             case lobby:
                 this.gameState = GameState.lobby;
-
                 break;
             case starting:
                 this.gameState = GameState.starting;
-
                 sendMessage(ChatColor.GREEN + "游戏即将开始,请做好准备!");
                 currentCounter = new StartingCounter(this);
                 break;
@@ -150,6 +148,10 @@ public class Game implements IReceiver{
                 break;
 
         }
+    }
+
+    public void dispose(){
+        getMap().unload();
     }
 
     public GamePlayer getWinner(){
