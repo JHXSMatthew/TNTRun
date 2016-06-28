@@ -1,5 +1,6 @@
 package com.mcndsj.TNTRun.utils;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemFactory;
@@ -8,6 +9,7 @@ import org.json.simple.JSONObject;
 /**
  * Created by Matthew on 29/06/2016.
  */
+@Getter
 public class LocationFactory {
 
     private int x;

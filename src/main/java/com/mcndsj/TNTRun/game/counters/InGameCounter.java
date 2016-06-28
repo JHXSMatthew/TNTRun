@@ -39,10 +39,15 @@ public class InGameCounter extends BukkitRunnable {
             if(gp.get().getGameMode() == GameMode.SPECTATOR){
                 continue;
             }
+            if(game.getMap().rangeCheck(gp.get().getLocation())){
+                game.onVoidDamage(gp.get());
+                continue;
+            }
             Location l = gp.get().getLocation().clone().add(0,-1,0);
             if(l.getBlock().getType() != Material.AIR){
                 cache.add(l);
             }
+
         }
     }
 }

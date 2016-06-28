@@ -83,6 +83,7 @@ public class Game implements IReceiver{
             gp.teleport(map.getSpawn());
         }else if(gameState == GameState.end){
             gp.teleport(map.getSpawn());
+            gp.setGameMode(GameMode.SPECTATOR);
         }else{
             gp.teleport(map.getLobby());
         }

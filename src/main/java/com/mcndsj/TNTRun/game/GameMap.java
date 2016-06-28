@@ -4,6 +4,8 @@ import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.utils.FileUtils;
 import com.mcndsj.TNTRun.utils.LocationFactory;
 import com.mcndsj.TNTRun.utils.WorldUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,6 +23,7 @@ import java.lang.reflect.Field;
 /**
  * Created by Matthew on 19/06/2016.
  */
+@Setter
 public class GameMap {
 
     private String name;
@@ -72,7 +75,7 @@ public class GameMap {
      * @param p
      */
     public GameMap(Player p){
-
+        wordName = p.getWorld().getName();
     }
 
     public void re_gen(){
@@ -104,5 +107,28 @@ public class GameMap {
 
     public Location getSpawn(){
         return spawn.getLocation();
+    }
+
+    public Location getUpCorner(){
+        return upCorner.getLocation();
+    }
+
+    public Location getDownCorner(){
+        return downCorner.getLocation();
+    }
+
+    /**
+     *
+     * @param l the current location
+     * @return true if out of range, false if still in the range
+     */
+    public boolean rangeCheck(Location l){
+        int x = l.getBlockX();
+        int y = l.getBlockY();
+        int z = l.getBlockZ();
+        if(x > upCorner.getX() || y > upCorner.getY() || z > upCorner.getZ() || x < downCorner.getX() || y < downCorner.getY() || z < downCorner.getZ()){
+            return true;
+        }
+        return false;
     }
 }
