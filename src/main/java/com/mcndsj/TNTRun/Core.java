@@ -1,5 +1,6 @@
 package com.mcndsj.TNTRun;
 
+import com.mcndsj.TNTRun.commands.tntCommand;
 import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import net.milkbowl.vault.chat.Chat;
@@ -23,6 +24,7 @@ public class Core extends JavaPlugin {
         pc = new PlayerManager();
         gc = new GameManager();
 
+        getServer().getPluginCommand("tnt").setExecutor(new tntCommand());
         getServer().getMessenger().registerOutgoingPluginChannel(this, "LobbyConnect");
     }
 
