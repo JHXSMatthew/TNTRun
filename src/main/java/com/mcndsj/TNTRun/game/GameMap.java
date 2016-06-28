@@ -1,10 +1,14 @@
 package com.mcndsj.TNTRun.game;
 
+import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.utils.FileUtils;
 import com.mcndsj.TNTRun.utils.LocationFactory;
+import com.mcndsj.TNTRun.utils.WorldUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.FileUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -72,31 +76,33 @@ public class GameMap {
     }
 
     public void re_gen(){
-
+        unload();
+        load();
     }
 
     public void load(){
-
+        WorldUtils.copyWorld(new File(Core.get().getDataFolder() + File.pathSeparator + "arena" + File.pathSeparator + wordName) , new File(wordName));
+        WorldUtils.loadWorld(wordName);
     }
 
     public void unload(){
-
+        WorldUtils.deleteWorld(wordName);
     }
 
     public String getName(){
         return name;
     }
 
-    //TODO: finish all those
     public World getWorld(){
-        return null;
+        return Bukkit.getWorld(wordName);
+
     }
 
     public Location getLobby(){
-        return null;
+        return Bukkit.getWorld("lobby").getSpawnLocation();
     }
 
     public Location getSpawn(){
-        return null;
+        return spawn.getLocation();
     }
 }
