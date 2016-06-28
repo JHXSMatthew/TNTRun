@@ -131,4 +131,17 @@ public class GameMap {
         }
         return false;
     }
+
+    public void addBounds(Location l){
+        if(upCorner != null){
+            downCorner = new LocationFactory(l);
+            return;
+        }
+        upCorner = new LocationFactory(l);
+    }
+
+    public void save(){
+
+    }
 }
+

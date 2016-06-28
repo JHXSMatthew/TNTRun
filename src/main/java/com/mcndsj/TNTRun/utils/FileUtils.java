@@ -14,4 +14,10 @@ public class FileUtils {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded);
     }
+
+    public static void writeFile(String path, String write)
+            throws IOException {
+
+        Files.write(Paths.get(path),write.getBytes());
+    }
 }
