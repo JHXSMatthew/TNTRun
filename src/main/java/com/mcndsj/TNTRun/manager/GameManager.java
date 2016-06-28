@@ -1,6 +1,7 @@
 package com.mcndsj.TNTRun.manager;
 
 import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GameMap;
 import org.bukkit.Bukkit;
@@ -20,7 +21,7 @@ public class GameManager {
 
 
     public GameManager(){
-        File dir = new File(Core.get().getDataFolder() + "/" + "Maps", "");
+        File dir = new File(Core.get().getDataFolder() + File.pathSeparator + Config.configFolderName, "");
         String files[] = dir.list();
         for(String s : files){
 

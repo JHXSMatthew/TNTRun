@@ -1,6 +1,7 @@
 package com.mcndsj.TNTRun.game;
 
 import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.utils.FileUtils;
 import com.mcndsj.TNTRun.utils.LocationFactory;
 import com.mcndsj.TNTRun.utils.WorldUtils;
@@ -84,7 +85,7 @@ public class GameMap {
     }
 
     public void load(){
-        WorldUtils.copyWorld(new File(Core.get().getDataFolder() + File.pathSeparator + "arena" + File.pathSeparator + wordName) , new File(wordName));
+        WorldUtils.copyWorld(new File(Core.get().getDataFolder().getPath() + File.pathSeparator + "arena" + File.pathSeparator + wordName) , new File(wordName));
         WorldUtils.loadWorld(wordName);
     }
 
@@ -141,7 +142,36 @@ public class GameMap {
     }
 
     public void save(){
+        File f = new File(Core.get().getDataFolder().getPath() + File.pathSeparator  + Config.configFolderName + File.pathSeparator + wordName );
+        if(!f.exists()){
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
+        JSONObject json = new JSONObject();
+        try {
+            for(Field field : GameMap.class.getDeclaredFields()){
+                if(field.getType() == String.class
+                        ||field.getType() == int.class ) {
+                    field.setAccessible(true);
+                    Object toSave = field.get(this);
+                    json.put(field.getName(),toSave);
+                }
+            }
+            json.put("upCorner",upCorner.getJSONObject());
+            json.put("downCorner",downCorner.getJSONObject());
+            json.put("spawn",spawn.getJSONObject()) ;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        try {
+            FileUtils.writeFile(f.getPath(),json.toJSONString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

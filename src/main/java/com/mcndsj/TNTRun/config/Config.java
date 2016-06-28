@@ -5,4 +5,5 @@ package com.mcndsj.TNTRun.config;
  */
 public class Config {
 
+    public static String configFolderName = "maps";
 }
