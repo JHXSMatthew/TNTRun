@@ -24,10 +24,15 @@ public class GameManager {
         File dir = new File(Core.get().getDataFolder() + File.pathSeparator + Config.configFolderName, "");
         String files[] = dir.list();
         for(String s : files){
-
             GameMap m = new GameMap(s);
             Core.get().getLogger().info("GameMap " +  gmap.get(gmap.size() -1 ).getName()  + " loaded !");
         }
+
+    }
+
+
+
+    public void nextNewGame(GameMap gp){
         try {
             //random get a map
             Collections.shuffle(gmap);
@@ -35,14 +40,7 @@ public class GameManager {
         }catch(Exception e){
 
         }
-    }
-
-    public void nextNewGame(GameMap gp){
         currentGame = new Game(gp);
-    }
-
-    public void loadMapRecursive(List<GameMap> store){
-
     }
 
 }
