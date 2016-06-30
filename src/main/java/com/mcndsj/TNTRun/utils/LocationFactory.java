@@ -25,10 +25,10 @@ public class LocationFactory {
     }
 
     public LocationFactory(JSONObject obj){
-        this.x = Integer.parseInt((String) obj.get("x"));
-        this.z = Integer.parseInt((String) obj.get("z"));
-        this.y = Integer.parseInt((String) obj.get("y"));
-        this.world = (String) obj.get("world");
+        this.x = Integer.parseInt(String.valueOf(obj.get("x")));
+        this.z = Integer.parseInt(String.valueOf(obj.get("z")));
+        this.y = Integer.parseInt(String.valueOf(obj.get("y")));
+        this.world = String.valueOf(obj.get("world"));
     }
 
     public LocationFactory(Location l){

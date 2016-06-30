@@ -44,8 +44,10 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent evt){
         evt.setQuitMessage("");
-        Core.getPlayerManager().removeControlPlayer(evt.getPlayer().getName());
+        // Before the player is removed, quit game operation executes in current game, or receive a NullPointerException.
         Core.getGameManager().currentGame.gameQuit(evt.getPlayer());
+        // Then remove it.
+        Core.getPlayerManager().removeControlPlayer(evt.getPlayer().getName());
 
         new BukkitRunnable(){
             public void run() {

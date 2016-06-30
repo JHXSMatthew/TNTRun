@@ -23,8 +23,10 @@ public class GameManager {
     public GameManager(){
         File dir = new File(Core.get().getDataFolder(), Config.configFolderName);
         File[] files = dir.listFiles();
+        if (files == null) return;
         for(File aFile : files){
             GameMap m = new GameMap(aFile);
+            gmap.add(m);
             Core.get().getLogger().info("GameMap " +  m.getName()  + " loaded !");
         }
 
@@ -32,15 +34,15 @@ public class GameManager {
 
 
 
-    public void nextNewGame(GameMap gp){
+    public void nextNewGame(){
         try {
             //random get a map
             Collections.shuffle(gmap);
-            nextNewGame(gmap.get(0));
+            currentGame = new Game(gmap.get(0));
         }catch(Exception e){
 
         }
-        currentGame = new Game(gp);
+
     }
 
 }
