@@ -151,6 +151,18 @@ public class Game implements IReceiver{
         }
     }
 
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public GameMap getMap() {
+        return map;
+    }
+
+    public List<GamePlayer> getInGame() {
+        return inGame;
+    }
+
     public void dispose(){
         getMap().unload();
     }

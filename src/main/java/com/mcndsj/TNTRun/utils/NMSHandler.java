@@ -35,7 +35,7 @@ public class NMSHandler {
 		for (Chunk currentChunk: chunks) {
 			net.minecraft.server.v1_8_R3.World mcWorld = ((CraftChunk) currentChunk).getHandle().world;
 		
-	        for (EntityHuman eh : (List<EntityHuman>) mcWorld.players) {
+	        for (EntityHuman eh : mcWorld.players) {
 	        	EntityPlayer ep = (EntityPlayer) eh;
 	            ep.chunkCoordIntPairQueue.add(new ChunkCoordIntPair(currentChunk.getX(), currentChunk.getZ()));
 	        }
@@ -64,7 +64,7 @@ public class NMSHandler {
 	
 	public void sendTitle(Player player, int fadein, int stay, int fadeout, String title, String subtitle) {
 		PlayerConnection pConn = ((CraftPlayer) player).getHandle().playerConnection;
-		PacketPlayOutTitle pTitleInfo = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, (IChatBaseComponent) null, (int) fadein, (int) stay, (int) fadeout);
+		PacketPlayOutTitle pTitleInfo = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadein, stay, fadeout);
 		pConn.sendPacket(pTitleInfo);
 		if (subtitle != null) {
 			subtitle = subtitle.replaceAll("%player%", player.getDisplayName());

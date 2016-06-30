@@ -11,13 +11,11 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-;
-
 public class FireWorkUlt {
 	
 	
 	public static void spawnFireWork(Location loc , World w){
-		 Firework fw = (Firework) w.spawn(loc.clone().add(new Vector(getRandomNum(5, -5), 0.6, getRandomNum(5, -5))), Firework.class);
+		 Firework fw = w.spawn(loc.clone().add(new Vector(getRandomNum(5, -5), 0.6, getRandomNum(5, -5))), Firework.class);
 		 FireworkMeta meta = fw.getFireworkMeta();
 		 FireworkEffect effect = getFireworkEffect(getRandomColor(),getRandomColor(), getRandomColor(), getRandomColor(), getRandomColor(), getRandomType());
 		 meta.addEffect(effect);

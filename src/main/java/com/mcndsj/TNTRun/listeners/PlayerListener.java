@@ -67,7 +67,7 @@ public class PlayerListener implements Listener{
     @EventHandler (priority = EventPriority.HIGH)
     public void noItemMove (InventoryClickEvent evt){
         if(evt.getView().getPlayer() instanceof Player){
-            if(!((Player)evt.getView().getPlayer()).hasPermission("lobby.admin")){
+            if(!evt.getView().getPlayer().hasPermission("lobby.admin")){
                 evt.setCancelled(true);
             }
         }

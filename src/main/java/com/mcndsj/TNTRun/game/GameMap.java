@@ -132,10 +132,7 @@ public class GameMap {
         int x = l.getBlockX();
         int y = l.getBlockY();
         int z = l.getBlockZ();
-        if(x > upCorner.getX() || y > upCorner.getY() || z > upCorner.getZ() || x < downCorner.getX() || y < downCorner.getY() || z < downCorner.getZ()){
-            return true;
-        }
-        return false;
+        return x > upCorner.getX() || y > upCorner.getY() || z > upCorner.getZ() || x < downCorner.getX() || y < downCorner.getY() || z < downCorner.getZ();
     }
 
     public void addBounds(Location l){
