@@ -50,18 +50,4 @@ public class LocationFactory {
         obj.put("world",world);
         return obj;
     }
-
-    /** Getters **/
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
-    }
 }

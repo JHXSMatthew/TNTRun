@@ -29,7 +29,7 @@ public class GameMap {
 
     private String name;
     private String wordName;
-    private String displayName;  //// TODO: 2016/6/30 [FUTURE] Unused variable, maybe new function? --Mulan Lin
+    private String displayName;
 
     private LocationFactory upCorner;
     private LocationFactory downCorner;
