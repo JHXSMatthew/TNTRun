@@ -26,7 +26,7 @@ public class tntCommand implements CommandExecutor {
 
         String label = strings[0];
 
-        if(label.equals("game")){
+        if(label.equals("game")){ //// TODO: 2016/6/30 [DISCUSS] "game" or "name", typo? -- Mulan Lin
             if(strings.length < 2){
                 showHelp(commandSender);
                 return true;
@@ -50,8 +50,7 @@ public class tntCommand implements CommandExecutor {
             map.save();
             map = null;
             commandSender.sendMessage("success!");
-        }
-
+        }else showHelp(commandSender);
         return true;
     }
 

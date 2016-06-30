@@ -1,6 +1,6 @@
 name: TNTRun
-main: com.mcndsj.TNTRun
-depend: [GameEvent, GameServerStatusSync]
+main: com.mcndsj.TNTRun.Core
+#depend: [GameEvent, GameServerStatusSync]    ## TODO: [DISCUSS] Check dependencies -- Mulan Lin
 version: 0.0.1-SNAPSHOT
 commands:
   tnt:

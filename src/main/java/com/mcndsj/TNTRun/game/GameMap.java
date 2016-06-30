@@ -29,7 +29,7 @@ public class GameMap {
 
     private String name;
     private String wordName;
-    private String displayName;
+    private String displayName;  //// TODO: 2016/6/30 [FUTURE] Unused variable, maybe new function? --Mulan Lin
 
     private LocationFactory upCorner;
     private LocationFactory downCorner;
@@ -37,15 +37,14 @@ public class GameMap {
 
     /**
      * on loading
-     * @param path
+     * @param f
      */
-    public GameMap(String path){
-        File f = new File(path);
+    public GameMap(File f){
         String s = null;
         try {
-            s = FileUtils.readFile(path);
+            s = FileUtils.readFile(f.getAbsolutePath());
         } catch (IOException e) {
-            System.err.println("Cannot load path " + path);
+            System.err.println("Cannot load path " + f.getAbsolutePath());
             e.printStackTrace();
             return;
         }
@@ -64,9 +63,8 @@ public class GameMap {
             upCorner = new LocationFactory((JSONObject) obj.get("upCorner"));
             downCorner = new LocationFactory((JSONObject) obj.get("downCorner"));
             spawn = new LocationFactory((JSONObject) obj.get("spawn"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+            name = (String) obj.get("name");    //2016-6-30 [NOTE] Added as new feature -- Mulan Lin
+        } catch (ParseException | IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         }
     }
@@ -97,9 +95,12 @@ public class GameMap {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public World getWorld(){
         return Bukkit.getWorld(wordName);
-
     }
 
     public Location getLobby(){
@@ -108,6 +109,10 @@ public class GameMap {
 
     public Location getSpawn(){
         return spawn.getLocation();
+    }
+
+    public void setSpawn(LocationFactory spawn) {
+        this.spawn = spawn;
     }
 
     public Location getUpCorner(){
@@ -142,7 +147,7 @@ public class GameMap {
     }
 
     public void save(){
-        File f = new File(Core.get().getDataFolder().getPath() + File.pathSeparator  + Config.configFolderName + File.pathSeparator + wordName );
+        File f = new File(new File(Core.get().getDataFolder().getPath(),Config.configFolderName),wordName);
         if(!f.exists()){
             try {
                 f.createNewFile();

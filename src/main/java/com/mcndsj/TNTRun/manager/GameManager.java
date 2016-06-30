@@ -21,11 +21,11 @@ public class GameManager {
 
 
     public GameManager(){
-        File dir = new File(Core.get().getDataFolder() + File.pathSeparator + Config.configFolderName, "");
-        String files[] = dir.list();
-        for(String s : files){
-            GameMap m = new GameMap(s);
-            Core.get().getLogger().info("GameMap " +  gmap.get(gmap.size() -1 ).getName()  + " loaded !");
+        File dir = new File(Core.get().getDataFolder(), Config.configFolderName);
+        File[] files = dir.listFiles();
+        for(File aFile : files){
+            GameMap m = new GameMap(aFile);
+            Core.get().getLogger().info("GameMap " +  m.getName()  + " loaded !");
         }
 
     }
