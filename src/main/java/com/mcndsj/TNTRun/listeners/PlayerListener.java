@@ -49,14 +49,14 @@ public class PlayerListener implements Listener{
         // Then remove it.
         Core.getPlayerManager().removeControlPlayer(evt.getPlayer().getName());
 
-        new BukkitRunnable(){
+        /*new BukkitRunnable(){
             public void run() {
                 if(Bukkit.getServer().getOnlinePlayers().size() == 0){
                     Bukkit.shutdown();
                 }
             }
         }.runTaskLater(Core.get(),20);
-
+           */ // [DEBUG] 2016-7-1 Try out memory leak
 
     }
 
