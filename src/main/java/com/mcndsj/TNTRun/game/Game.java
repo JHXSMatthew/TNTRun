@@ -5,7 +5,7 @@ import com.mcndsj.TNTRun.game.UsedI.IReceiver;
 import com.mcndsj.TNTRun.game.counters.EndGameCounter;
 import com.mcndsj.TNTRun.game.counters.InGameCounter;
 import com.mcndsj.TNTRun.game.counters.StartingCounter;
-import com.mcndsj.TNTRun.utils.BungeeUtils;
+import com.mcndsj.TNTRun.manager.PlayerManager;
 import org.bukkit.*;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -37,20 +37,23 @@ public class Game implements IReceiver{
 
 
     public void gameJoin(Player p){
-        GamePlayer gp  = Core.getPlayerManager().getControlPlayer(p.getName());
+        GamePlayer gp  = PlayerManager.get().getControlPlayer(p.getName());
         inGame.add(gp);
-        sendMessage(  ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + "("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
+        gp.setGame(this);
+
+        sendMessage(ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + " ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
         if(inGame.size() == Bukkit.getMaxPlayers() && gameState == GameState.lobby) // pre-condition check
             switchState(GameState.starting);
 
     }
 
     public void gameQuit(Player p){
-        GamePlayer gp  = Core.getPlayerManager().getControlPlayer(p.getName());
+        GamePlayer gp  = PlayerManager.get().getControlPlayer(p.getName());
         if(gp == null){
             return;
         }
         inGame.remove(gp);
+        gp.setGame(null);
         sendMessage(  ChatColor.GRAY  + "玩家 "+gp.getName() +" 离开了游戏!" );
         gp.sendToLobby();
         gp.get().setGameMode(GameMode.SPECTATOR);

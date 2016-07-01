@@ -1,9 +1,13 @@
 package com.mcndsj.TNTRun.listeners;
 
 import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.config.Messages;
+import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GamePlayer;
 import com.mcndsj.TNTRun.game.GameState;
+import com.mcndsj.TNTRun.manager.GameManager;
+import com.mcndsj.TNTRun.manager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
@@ -26,15 +30,20 @@ public class PlayerListener implements Listener{
         if(evt.getResult() != PlayerLoginEvent.Result.ALLOWED) {
             return;
         }
-        Core.getPlayerManager().createControlPlayer(evt.getPlayer().getUniqueId(), evt.getPlayer().getName());
+
+        if(Config.setUp)
+            return;
+
+        PlayerManager.get().createControlPlayer(evt.getPlayer().getUniqueId(), evt.getPlayer().getName());
         //load data
     }
 
     @EventHandler
     public void onDamage(EntityDamageEvent evt){
         if(evt.getCause() == EntityDamageEvent.DamageCause.VOID && evt.getEntity() instanceof Player){
-            if(Core.getGameManager().currentGame.getGameState() == GameState.inGaming){
-                Core.getGameManager().currentGame.onVoidDamage((Player) evt.getEntity());
+            Game g = PlayerManager.get().getControlPlayer(((Player)evt.getEntity()).getName()).getGame();
+            if(g != null && g.getGameState() == GameState.inGaming){
+                g.onVoidDamage((Player) evt.getEntity());
             }
         }
         evt.setCancelled(true);
@@ -43,11 +52,15 @@ public class PlayerListener implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent evt){
-        evt.setQuitMessage("");
+        evt.setQuitMessage(null);
+
+        if(Config.setUp)
+            return;
+
         // Before the player is removed, quit game operation executes in current game, or receive a NullPointerException.
-        Core.getGameManager().currentGame.gameQuit(evt.getPlayer());
+        GameManager.get().gameQuit(evt.getPlayer());
         // Then remove it.
-        Core.getPlayerManager().removeControlPlayer(evt.getPlayer().getName());
+        PlayerManager.get().removeControlPlayer(evt.getPlayer().getName());
 
         /*new BukkitRunnable(){
             public void run() {
@@ -104,21 +117,15 @@ public class PlayerListener implements Listener{
     }
 
 
-    @EventHandler
-    public void onLogin(PlayerLoginEvent evt){
-        if(evt.getResult() != PlayerLoginEvent.Result.ALLOWED){
-            if(evt.getPlayer().hasPermission("lobby.fulljoin")){
-                evt.allow();
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent evt){
-        Player p = evt.getPlayer();
-        Core.getPlayerManager().getControlPlayer(evt.getPlayer().getName()).ConstructCall(p);
+        evt.setJoinMessage(null);
+        if(Config.setUp)
+            return;
 
-        Core.getGameManager().currentGame.gameJoin(evt.getPlayer());
+        Player p = evt.getPlayer();
+        PlayerManager.get().getControlPlayer(evt.getPlayer().getName()).ConstructCall(p);
+        GameManager.get().gameJoin(evt.getPlayer());
 
     }
 
@@ -127,7 +134,7 @@ public class PlayerListener implements Listener{
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChatEvent(AsyncPlayerChatEvent evt){
         Player p = evt.getPlayer();
-        GamePlayer cp = Core.getPlayerManager().getControlPlayer(p.getName());
+        GamePlayer cp =  PlayerManager.get().getControlPlayer(p.getName());
         if(cp.getLastChat() > System.currentTimeMillis()){
                 p.sendMessage(ChatColor.YELLOW +"距离您上次发言还不足3秒,为了 避免刷屏嫌疑,请您稍后再试!");
                 evt.setCancelled(true);

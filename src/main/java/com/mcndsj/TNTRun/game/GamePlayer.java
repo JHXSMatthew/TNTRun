@@ -8,14 +8,18 @@ import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.UsedI.IReceiver;
 import com.mcndsj.TNTRun.utils.BungeeUtils;
 import com.mcndsj.TNTRun.utils.NMSHandler;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-
+@Getter
+@Setter
 public class GamePlayer implements IReceiver {
     private UUID uuid;
     private String name;
-    private Player p ;
+    private Player player;
+    private Game game;
 
     private boolean isUsingPlayerHider = false;
     private long lastUsePlayerHider = -1;
@@ -32,12 +36,12 @@ public class GamePlayer implements IReceiver {
     }
 
     public void ConstructCall(Player p){
-        this.p = p;
+        this.player = p;
         chatQueue = new ArrayList<String>();
     }
 
     public String getPrefix(){
-        return Core.chat.getPlayerPrefix(p);
+        return Core.chat.getPlayerPrefix(player);
     }
 
     public long getLastChat(){
@@ -52,15 +56,15 @@ public class GamePlayer implements IReceiver {
         if(isUsingPlayerHider){
             isUsingPlayerHider = false;
             for(Player p : Bukkit.getOnlinePlayers()){
-                if(p != this.p){
-                    this.p.showPlayer(p);
+                if(p != this.player){
+                    this.player.showPlayer(p);
                 }
             }
         }else{
             isUsingPlayerHider = true;
             for(Player p : Bukkit.getOnlinePlayers()){
-                if(p != this.p){
-                    this.p.hidePlayer(p);
+                if(p != this.player){
+                    this.player.hidePlayer(p);
                 }
             }
         }
@@ -98,50 +102,55 @@ public class GamePlayer implements IReceiver {
     }
 
     public Player get(){
-        return p;
+        return player;
     }
 
 
     public void sendMessage(String msg) {
-        p.sendMessage(ChatColor.AQUA+ "游乐园 >>" + ChatColor.RESET + msg);
+        player.sendMessage(ChatColor.AQUA+ "游乐园 >> " + ChatColor.RESET + msg);
     }
 
     public void sendTitle(String message, String sub){
         if(message == null){
-            NMSHandler.get().sendTitle(p,0,40,20," ",sub);
+            NMSHandler.get().sendTitle(player,0,40,20," ",sub);
         }else if(sub == null){
-            NMSHandler.get().sendTitle(p,0,40,20,message," ");
+            NMSHandler.get().sendTitle(player,0,40,20,message," ");
         }else {
-            NMSHandler.get().sendTitle(p,0,40,20,message,sub);
+            NMSHandler.get().sendTitle(player,0,40,20,message,sub);
         }
     }
 
     public void sendActionBar(String bar) {
-        NMSHandler.get().sendActionBar(p,bar);
+        NMSHandler.get().sendActionBar(player,bar);
 
     }
 
     public void sendSound(Sound s) {
-        p.playSound(p.getLocation(),s,1F,1F);
+        player.playSound(player.getLocation(),s,1F,1F);
     }
 
     public void teleport(Location l) {
-        p.teleport(l);
+        player.teleport(l);
     }
 
     public void setPreGameStart() {
-        p.setGameMode(GameMode.ADVENTURE);
-        p.setHealth(p.getMaxHealth());
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setHealth(player.getMaxHealth());
 
     }
 
     public void setPostJoin() {
-        p.setGameMode(GameMode.ADVENTURE);
-        p.setHealth(p.getMaxHealth());
+        player.setGameMode(GameMode.ADVENTURE);
+        player.setHealth(player.getMaxHealth());
+    }
+
+
+    public void setPostFinish(){
+        this.game = null;
     }
 
     public void sendToLobby() {
-        BungeeUtils.sendPlayerTo(p);
+        BungeeUtils.sendPlayerTo(player);
     }
 
 

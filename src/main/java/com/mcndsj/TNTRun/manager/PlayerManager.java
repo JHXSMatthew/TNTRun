@@ -7,6 +7,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
+
+
+
+	private static PlayerManager manager;
+
+
+
 	private ConcurrentHashMap<String,GamePlayer> hash = new ConcurrentHashMap<String,GamePlayer>();
 	
 
@@ -23,9 +30,16 @@ public class PlayerManager {
 		return lp;
 	}
 	
-	public void removeControlPlayer(String name){
-		hash.remove(name);
+	public GamePlayer removeControlPlayer(String name){
+		 return hash.remove(name);
 	}
-	
+
+
+	public static PlayerManager get(){
+		if(manager == null)
+			manager = new PlayerManager();
+
+		return manager;
+	}
 
 }

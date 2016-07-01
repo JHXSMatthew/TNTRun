@@ -2,6 +2,9 @@ package com.mcndsj.TNTRun.commands;
 
 import com.mcndsj.TNTRun.game.GameMap;
 import com.mcndsj.TNTRun.utils.LocationFactory;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,7 +29,7 @@ public class tntCommand implements CommandExecutor {
 
         String label = strings[0];
 
-        if(label.equals("game")){ //// TODO: 2016/6/30 [DISCUSS] "game" or "name", typo? -- Mulan Lin
+        if(label.equals("game")){
             if(strings.length < 2){
                 showHelp(commandSender);
                 return true;
@@ -37,10 +40,12 @@ public class tntCommand implements CommandExecutor {
             }
             map = new GameMap((Player) commandSender);
             map.setName(strings[1]);
+            commandSender.sendMessage(map.getName());
             return true;
         }
         if(label.equals("spawn")){
             map.setSpawn(new LocationFactory(((Player) commandSender).getLocation()));
+            commandSender.sendMessage("spawn done!");
         }else if(label.equals("loc")){
             map.addBounds(((Player) commandSender).getLocation());
             commandSender.sendMessage(String.valueOf(count));
@@ -50,15 +55,25 @@ public class tntCommand implements CommandExecutor {
             map.save();
             map = null;
             commandSender.sendMessage("success!");
+        }else if(label.equals("world")){
+            if(strings.length < 2){
+                showHelp(commandSender);
+                return true;
+            }
+            if(Bukkit.getWorld(strings[1]) == null)
+                Bukkit.createWorld(new WorldCreator(strings[1]));
+            ((Player) commandSender).teleport(Bukkit.getWorld(strings[1]).getSpawnLocation());
+            ((Player) commandSender).setGameMode(GameMode.SPECTATOR);
         }else showHelp(commandSender);
         return true;
     }
 
     private void showHelp(CommandSender sender){
-        sender.sendMessage("- /tnt name <Name> = new game ");
+        sender.sendMessage("- /tnt game <Name> = new game ");
         sender.sendMessage("- /tnt spawn = set spawn point");
         sender.sendMessage("- /tnt loc = set bound");
         sender.sendMessage("- /tnt save = save and clean");
+        sender.sendMessage("- /tnt world <worldName> = save and clean");
 
     }
 }

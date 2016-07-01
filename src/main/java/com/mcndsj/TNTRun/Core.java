@@ -14,23 +14,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Core extends JavaPlugin {
 
     public static Chat chat = null;
-    private static PlayerManager pc;
-    private static GameManager gc;
-
     private static Core instance;
 
 
     public void onEnable(){
         instance = this;
-        pc = new PlayerManager();
-        gc = new GameManager();
+        saveDefaultConfig();
 
         getServer().getPluginCommand("tnt").setExecutor(new tntCommand());
         getServer().getMessenger().registerOutgoingPluginChannel(this, "LobbyConnect");
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        //[DEBUG] 2016-7-1
-        getGameManager().nextNewGame();
+        GameManager.get().nextNewGame();
     }
 
     private boolean setupChat() {
@@ -40,14 +35,6 @@ public class Core extends JavaPlugin {
         }
 
         return (chat != null);
-    }
-
-    public static PlayerManager getPlayerManager(){
-        return pc;
-    }
-
-    public static GameManager getGameManager(){
-        return gc;
     }
 
     public static Core get(){

@@ -174,6 +174,7 @@ public class GameMap {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        WorldUtils.copyWorld(new File(wordName), new File(Core.get().getDataFolder() + File.separator + Config.mapFolderName,wordName));
     }
 }
 
