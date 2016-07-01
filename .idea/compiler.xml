@@ -28,7 +28,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="TNTRun" target="1.7" />
+      <module name="TNTRun" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
