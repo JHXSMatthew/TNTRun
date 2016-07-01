@@ -184,8 +184,21 @@ public class GameMap implements IGameMap{
                     json.put(field.getName(),toSave);
                 }
             }
-            json.put("upCorner",upCorner.getJSONObject());
-            json.put("downCorner",downCorner.getJSONObject());
+
+            int[] up = new int[3];
+            int[] down = new int[3];
+
+            up[0] = upCorner.getX() > downCorner.getX() ? upCorner.getY() : downCorner.getX();
+            up[1] = upCorner.getY() > downCorner.getY() ? upCorner.getY() : downCorner.getY();
+            up[2] = upCorner.getZ() > downCorner.getZ() ? upCorner.getZ() : downCorner.getZ();
+
+            down[0] = upCorner.getX() < downCorner.getX() ? upCorner.getY() : downCorner.getX();
+            down[1] = upCorner.getY() < downCorner.getY() ? upCorner.getY() : downCorner.getY();
+            down[2] = upCorner.getZ() < downCorner.getZ() ? upCorner.getZ() : downCorner.getZ();
+
+
+            json.put("upCorner",new LocationFactory(up[0],up[1],up[2],upCorner.getWorld()).getJSONObject());
+            json.put("downCorner",new LocationFactory(down[0],down[1],down[2],upCorner.getWorld()).getJSONObject());
             json.put("spawn",spawn.getJSONObject()) ;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -197,6 +210,7 @@ public class GameMap implements IGameMap{
         }
         WorldUtils.copyWorld(new File(worldName), new File(Core.get().getDataFolder() + File.separator + Config.mapFolderName, worldName));
     }
+
 
     protected LocationFactory getUpCornerF(){
         return this.upCorner;

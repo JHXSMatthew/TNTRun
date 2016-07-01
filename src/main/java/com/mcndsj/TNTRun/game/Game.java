@@ -49,6 +49,7 @@ public class Game implements IReceiver{
         gp.setGame(this);
         gp.setPostJoin();
         show(gp);
+        p.teleport(map.getLobby());
         sendMessage(ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + " ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
         if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) // pre-condition check
             switchState(GameState.starting);
