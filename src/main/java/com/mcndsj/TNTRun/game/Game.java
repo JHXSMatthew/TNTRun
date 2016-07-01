@@ -1,10 +1,12 @@
 package com.mcndsj.TNTRun.game;
 
 import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.UsedI.IReceiver;
 import com.mcndsj.TNTRun.game.counters.EndGameCounter;
 import com.mcndsj.TNTRun.game.counters.InGameCounter;
 import com.mcndsj.TNTRun.game.counters.StartingCounter;
+import com.mcndsj.TNTRun.game.gameMap.IGameMap;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import org.bukkit.*;
 import lombok.Getter;
@@ -21,28 +23,34 @@ import java.util.List;
 public class Game implements IReceiver{
 
 
+    private int id;
     private List<GamePlayer> inGame = new ArrayList<GamePlayer>();
     private GameState gameState = null;
-    private GameMap map;
+    private IGameMap map;
     private BukkitRunnable currentCounter;
 
 
-    public Game(GameMap map){
+    public Game(IGameMap map, int id){
         //load map
+        this.id = id;
         this.map = map;
         map.load();
-
         switchState(GameState.lobby);
     }
+
+
+
+
 
 
     public void gameJoin(Player p){
         GamePlayer gp  = PlayerManager.get().getControlPlayer(p.getName());
         inGame.add(gp);
         gp.setGame(this);
-
+        gp.setPostJoin();
+        show(gp);
         sendMessage(ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + " ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
-        if(inGame.size() == Bukkit.getMaxPlayers() && gameState == GameState.lobby) // pre-condition check
+        if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) // pre-condition check
             switchState(GameState.starting);
 
     }
@@ -58,6 +66,7 @@ public class Game implements IReceiver{
         gp.sendToLobby();
         gp.get().setGameMode(GameMode.SPECTATOR);
         checkWinning();
+        hide(gp);
     }
 
     public void checkWinning(){
@@ -218,6 +227,21 @@ public class Game implements IReceiver{
             gp.sendToLobby();
         }
     }
+
+
+    public void hide(GamePlayer gp){
+        for(GamePlayer temp : inGame){
+            gp.hide(gp);
+        }
+    }
+
+
+    public void show(GamePlayer gp){
+        for(GamePlayer temp : inGame){
+            gp.show(gp);
+        }
+    }
+
 
 
 }

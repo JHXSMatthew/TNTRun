@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemFactory;
 import org.json.simple.JSONObject;
+import org.omg.PortableInterceptor.LOCATION_FORWARD;
 
 /**
  * Created by Matthew on 29/06/2016.
@@ -42,6 +43,16 @@ public class LocationFactory {
         return Bukkit.getWorld(world).getBlockAt(x,y,z).getLocation();
     }
 
+    /**
+     *
+     * @param w world name
+     * @return the original , not clone
+     */
+    public LocationFactory setWorldO(String w){
+        world = w;
+        return this;
+    }
+
     public JSONObject getJSONObject(){
         JSONObject obj = new JSONObject();
         obj.put("x",x);
@@ -49,5 +60,10 @@ public class LocationFactory {
         obj.put("z",z);
         obj.put("world",world);
         return obj;
+    }
+
+    @Override
+    public LocationFactory clone(){
+        return new LocationFactory(x,y,z,world);
     }
 }

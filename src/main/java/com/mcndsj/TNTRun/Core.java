@@ -5,6 +5,8 @@ import com.mcndsj.TNTRun.listeners.PlayerListener;
 import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import net.milkbowl.vault.chat.Chat;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,7 +27,15 @@ public class Core extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "LobbyConnect");
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        GameManager.get().nextNewGame();
+        //TODO: CALL FUCKING EVENT HERE
+    }
+
+    public void onDisable(){
+        GameManager.get().dispose();
+        for(Player p : Bukkit.getOnlinePlayers()){
+            p.kickPlayer("reloading");
+            //TODO: FACKING SEND PLAYER TO LOBBY
+        }
     }
 
     private boolean setupChat() {

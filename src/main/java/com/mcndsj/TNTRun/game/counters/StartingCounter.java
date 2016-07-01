@@ -1,5 +1,7 @@
 package com.mcndsj.TNTRun.game.counters;
 
+import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GameState;
 import org.bukkit.Bukkit;
@@ -20,6 +22,8 @@ public class StartingCounter extends BukkitRunnable {
     public StartingCounter(Game game){
         current = maxCount;
         this.game = game;
+        runTaskTimer(Core.get(),0,20);
+
     }
 
 
@@ -28,7 +32,7 @@ public class StartingCounter extends BukkitRunnable {
         if(current == 0){
             game.switchState(GameState.inGaming);
         }else{
-            if(game.getInGame().size() < Bukkit.getMaxPlayers()/2){
+            if(game.getInGame().size() < Config.playerPerGame/2){
                 game.switchState(GameState.lobby);
                 game.sendMessage(ChatColor.RED + "人数不足,请等待更多玩家加入!");
             }
@@ -36,7 +40,7 @@ public class StartingCounter extends BukkitRunnable {
         //send action Bar
         if(current %10 == 0 || current < 10){
             game.sendSound(Sound.CLICK);
-            game.sendTitle(null, ChatColor.GREEN + "还有 " + current + " 开始");
+            game.sendTitle(null, ChatColor.RED + "游戏还有 " + current + " 秒开始");
         }
 
         game.sendActionBar(ChatColor.GREEN + "== 距离游戏开始 " + current+ " 秒 ==");

@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 
 @Getter
 @Setter
-public class GamePlayer implements IReceiver {
+public class GamePlayer implements IReceiver{
     private UUID uuid;
     private String name;
     private Player player;
@@ -153,5 +153,23 @@ public class GamePlayer implements IReceiver {
         BungeeUtils.sendPlayerTo(player);
     }
 
+    public void hide(GamePlayer gp){
+        hide(gp.get());
+    }
+
+    public void show(GamePlayer gp){
+        show(gp.get());
+    }
+
+
+    private void hide(Player p){
+        player.hidePlayer(p);
+        p.hidePlayer(player);
+    }
+
+    private void show(Player p){
+        player.showPlayer(p);
+        p.showPlayer(p);
+    }
 
 }

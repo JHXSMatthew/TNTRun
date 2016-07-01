@@ -1,5 +1,6 @@
 package com.mcndsj.TNTRun.game.counters;
 
+import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GamePlayer;
 import com.mcndsj.TNTRun.game.GameState;
@@ -23,6 +24,8 @@ public class InGameCounter extends BukkitRunnable {
     public InGameCounter(Game game){
         this.game = game;
         cache = new ArrayList<Location>();
+        runTaskTimer(Core.get(),0,20);
+
     }
 
 

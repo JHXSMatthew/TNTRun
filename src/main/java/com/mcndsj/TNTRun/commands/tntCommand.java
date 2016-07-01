@@ -1,6 +1,9 @@
 package com.mcndsj.TNTRun.commands;
 
-import com.mcndsj.TNTRun.game.GameMap;
+import com.mcndsj.TNTRun.game.GameState;
+import com.mcndsj.TNTRun.game.gameMap.GameMap;
+import com.mcndsj.TNTRun.manager.GameManager;
+import com.mcndsj.TNTRun.manager.PlayerManager;
 import com.mcndsj.TNTRun.utils.LocationFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -64,6 +67,8 @@ public class tntCommand implements CommandExecutor {
                 Bukkit.createWorld(new WorldCreator(strings[1]));
             ((Player) commandSender).teleport(Bukkit.getWorld(strings[1]).getSpawnLocation());
             ((Player) commandSender).setGameMode(GameMode.SPECTATOR);
+        }else if(label.equals("start")){
+            PlayerManager.get().getControlPlayer(commandSender.getName()).getGame().switchState(GameState.starting);
         }else showHelp(commandSender);
         return true;
     }
@@ -74,6 +79,7 @@ public class tntCommand implements CommandExecutor {
         sender.sendMessage("- /tnt loc = set bound");
         sender.sendMessage("- /tnt save = save and clean");
         sender.sendMessage("- /tnt world <worldName> = save and clean");
+        sender.sendMessage("- /tnt start");
 
     }
 }

@@ -124,7 +124,9 @@ public class PlayerListener implements Listener{
             return;
 
         Player p = evt.getPlayer();
-        PlayerManager.get().getControlPlayer(evt.getPlayer().getName()).ConstructCall(p);
+        GamePlayer gp = PlayerManager.get().getControlPlayer(evt.getPlayer().getName());
+        gp.ConstructCall(p);
+        GameManager.get().hide(gp);
         GameManager.get().gameJoin(evt.getPlayer());
 
     }
@@ -156,4 +158,6 @@ public class PlayerListener implements Listener{
         cp.setLastChat(evt.getMessage(), System.currentTimeMillis() + 4000);
         evt.setFormat("0 " + ChatColor.translateAlternateColorCodes('&', cp.getPrefix().replace("&l", ""))  + "%s "+ ChatColor.GOLD + ">>"+ ChatColor.GRAY + " %s");
     }
+
+
 }

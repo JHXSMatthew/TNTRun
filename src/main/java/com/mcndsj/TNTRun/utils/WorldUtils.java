@@ -152,7 +152,7 @@ public class WorldUtils {
 	            }
 	        }
 	    } catch (IOException e) {
-	 
+	        e.printStackTrace();
 	    }
 	}
 	

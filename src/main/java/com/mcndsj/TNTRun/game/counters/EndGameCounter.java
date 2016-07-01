@@ -1,5 +1,6 @@
 package com.mcndsj.TNTRun.game.counters;
 
+import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GamePlayer;
 import com.mcndsj.TNTRun.game.GameState;
@@ -23,6 +24,7 @@ public class EndGameCounter extends BukkitRunnable {
     public EndGameCounter(Game game){
         current = maxCount;
         this.game = game;
+        runTaskTimer(Core.get(),0,20);
     }
 
 

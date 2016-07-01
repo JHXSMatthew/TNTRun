@@ -1,7 +1,9 @@
-package com.mcndsj.TNTRun.game;
+package com.mcndsj.TNTRun.game.gameMap;
 
 import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.config.Config;
+import com.mcndsj.TNTRun.game.Game;
+import com.mcndsj.TNTRun.manager.ThreadManager;
 import com.mcndsj.TNTRun.utils.FileUtils;
 import com.mcndsj.TNTRun.utils.LocationFactory;
 import com.mcndsj.TNTRun.utils.WorldUtils;
@@ -12,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.FileUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -25,11 +26,11 @@ import java.lang.reflect.Field;
  * Created by Matthew on 19/06/2016.
  */
 @Setter
-public class GameMap {
+public class GameMap implements IGameMap{
 
     private String name;
-    private String wordName;
-    private String displayName;
+    @Getter
+    private String worldName;
 
     private LocationFactory upCorner;
     private LocationFactory downCorner;
@@ -63,10 +64,18 @@ public class GameMap {
             upCorner = new LocationFactory((JSONObject) obj.get("upCorner"));
             downCorner = new LocationFactory((JSONObject) obj.get("downCorner"));
             spawn = new LocationFactory((JSONObject) obj.get("spawn"));
-            name = (String) obj.get("name");    //2016-6-30 [NOTE] Added as new feature -- Mulan Lin
+            //name = (String) obj.get("name");    //2016-6-30 [NOTE] Added as new feature -- Mulan Lin , reflection done the job for all strings.
         } catch (ParseException | IllegalAccessException | ClassCastException e) {
             e.printStackTrace();
         }
+    }
+
+    public GameMap(LocationFactory up,LocationFactory down, LocationFactory spawn, String worldName,String name){
+        this.name = name;
+        this.worldName = worldName;
+        this.upCorner = up;
+        this.downCorner = down;
+        this.spawn = spawn;
     }
 
     /**
@@ -74,21 +83,33 @@ public class GameMap {
      * @param p
      */
     public GameMap(Player p){
-        wordName = p.getWorld().getName();
-    }
-
-    public void re_gen(){
-        unload();
-        load();
+        worldName = p.getWorld().getName();
     }
 
     public void load(){
-        WorldUtils.copyWorld(new File(Core.get().getDataFolder().getPath() + File.pathSeparator + "arena" + File.pathSeparator + wordName) , new File(wordName));
-        WorldUtils.loadWorld(wordName);
+        ThreadManager.runTask(new Runnable() {
+            @Override
+            public void run() {
+                WorldUtils.copyWorld(new File(Core.get().getDataFolder().getPath() + File.separator + Config.mapFolderName+ File.separator + worldName) , new File(worldName));
+                //callback
+                new BukkitRunnable(){
+                    @Override
+                    public void run() {
+                        WorldUtils.loadWorld(worldName);
+                    }
+                }.runTask(Core.get());
+
+            }
+        });
     }
 
     public void unload(){
-        WorldUtils.deleteWorld(wordName);
+        ThreadManager.runTask(new Runnable() {
+            @Override
+            public void run() {
+                WorldUtils.deleteWorld(worldName);
+            }
+        });
     }
 
     public String getName(){
@@ -100,7 +121,7 @@ public class GameMap {
     }
 
     public World getWorld(){
-        return Bukkit.getWorld(wordName);
+        return Bukkit.getWorld(worldName);
     }
 
     public Location getLobby(){
@@ -144,7 +165,7 @@ public class GameMap {
     }
 
     public void save(){
-        File f = new File(new File(Core.get().getDataFolder().getPath(),Config.configFolderName),wordName);
+        File f = new File(new File(Core.get().getDataFolder().getPath(),Config.configFolderName), worldName);
         if(!f.exists()){
             try {
                 f.createNewFile();
@@ -174,7 +195,22 @@ public class GameMap {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        WorldUtils.copyWorld(new File(wordName), new File(Core.get().getDataFolder() + File.separator + Config.mapFolderName,wordName));
+        WorldUtils.copyWorld(new File(worldName), new File(Core.get().getDataFolder() + File.separator + Config.mapFolderName, worldName));
+    }
+
+    protected LocationFactory getUpCornerF(){
+        return this.upCorner;
+    }
+    protected LocationFactory getDownCornerF(){
+        return this.downCorner;
+    }
+    protected LocationFactory getSpawnF(){
+        return this.spawn;
+    }
+
+    @Override
+    public GameMap clone(){
+        return new GameMap(upCorner.clone(),downCorner.clone(),spawn.clone(), worldName,name);
     }
 }
 
