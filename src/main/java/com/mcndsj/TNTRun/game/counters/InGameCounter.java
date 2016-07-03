@@ -48,10 +48,18 @@ public class InGameCounter extends BukkitRunnable {
                 continue;
             }
             Location l = gp.get().getLocation().clone().add(0,-1,0);
-            if(l.getBlock().getType() != Material.AIR){
-                cache.add(l);
-            }
-
+            List<Location> list = new ArrayList<>();
+            double shiftX = Math.abs(l.getX() - l.getBlockX());
+            double shiftZ = Math.abs(l.getZ() - l.getBlockZ());
+            list.add(l);
+            //-0.3~0.3, 0.3~0.7
+            if (shiftX <= 0.3) list.add(l.clone().add(-1, 0, 0));
+            if (shiftX >= 0.7) list.add(l.clone().add(1, 0, 0));
+            if (shiftZ <= 0.3) list.add(l.clone().add(0, 0, -1));
+            if (shiftZ >= 0.7) list.add(l.clone().add(0, 0, 1));
+            list.forEach((e) -> {
+                if (e.getBlock().getType() != Material.AIR) cache.add(e);
+            });
         }
 
         game.getWatchdog().feed(); // 喂狗
