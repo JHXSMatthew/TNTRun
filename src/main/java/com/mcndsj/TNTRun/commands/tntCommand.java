@@ -4,7 +4,6 @@ import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GameState;
 import com.mcndsj.TNTRun.game.gameMap.GameMap;
-import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import com.mcndsj.TNTRun.utils.LocationFactory;
 import org.bukkit.Bukkit;

@@ -13,33 +13,29 @@ public class PlayerManager {
 	private static PlayerManager manager;
 
 
+	private ConcurrentHashMap<String, GamePlayer> hash = new ConcurrentHashMap<>();
 
-	private ConcurrentHashMap<String,GamePlayer> hash = new ConcurrentHashMap<String,GamePlayer>();
-	
+	public static PlayerManager get() {
+		if (manager == null)
+			manager = new PlayerManager();
 
-	public GamePlayer getControlPlayer(String name){
-		GamePlayer lp = hash.get(name);
-	
-		return lp != null? lp : createControlPlayer(Bukkit.getPlayer(name).getUniqueId(),name);
+		return manager;
 	}
 	
+	public GamePlayer getControlPlayer(String name){
+		GamePlayer lp = hash.get(name);
+
+		return lp != null? lp : createControlPlayer(Bukkit.getPlayer(name).getUniqueId(),name);
+	}
 	
 	public GamePlayer createControlPlayer(UUID uuid , String name){
 		GamePlayer lp = new GamePlayer(uuid,name);
 		hash.put(name, lp);
 		return lp;
 	}
-	
+
 	public GamePlayer removeControlPlayer(String name){
 		 return hash.remove(name);
-	}
-
-
-	public static PlayerManager get(){
-		if(manager == null)
-			manager = new PlayerManager();
-
-		return manager;
 	}
 
 }

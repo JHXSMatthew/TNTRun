@@ -2,7 +2,6 @@ package com.mcndsj.TNTRun.game.gameMap;
 
 import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.config.Config;
-import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.manager.ThreadManager;
 import com.mcndsj.TNTRun.utils.FileUtils;
 import com.mcndsj.TNTRun.utils.LocationFactory;

@@ -3,10 +3,10 @@ package com.mcndsj.TNTRun.manager;
 import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.Game;
-import com.mcndsj.TNTRun.game.gameMap.DecoratedGameMap;
-import com.mcndsj.TNTRun.game.gameMap.GameMap;
 import com.mcndsj.TNTRun.game.GamePlayer;
 import com.mcndsj.TNTRun.game.GameState;
+import com.mcndsj.TNTRun.game.gameMap.DecoratedGameMap;
+import com.mcndsj.TNTRun.game.gameMap.GameMap;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -21,8 +21,8 @@ import java.util.List;
 public class GameManager {
 
     private static GameManager manager;
-    private List<Game> games = new ArrayList<Game>();
-    private List<GameMap> gmap = new ArrayList<GameMap>();
+    private List<Game> games = new ArrayList<>();
+    private List<GameMap> gmap = new ArrayList<>();
 
 
     public GameManager(){
@@ -49,7 +49,10 @@ public class GameManager {
 
     }
 
-
+    public static GameManager get() {
+        if (manager == null) manager = new GameManager();
+        return manager;
+    }
 
     public Game nextNewGame(){
         try {
@@ -57,7 +60,7 @@ public class GameManager {
             Collections.shuffle(gmap);
             GameMap chosenMap = gmap.get(0);
             int validId = 0;
-            List<Integer> id  = new ArrayList<Integer>();
+            List<Integer> id = new ArrayList<>();
             for(Game g : games){
                 if(g.getMap().getName().equals(chosenMap.getName()))
                     id.add(g.getId());
@@ -104,11 +107,6 @@ public class GameManager {
     public void gameQuit(Player p ){
         GamePlayer gp = PlayerManager.get().getControlPlayer(p.getName());
         gp.getGame().gameQuit(p);
-    }
-
-    public static GameManager get(){
-        if(manager == null) manager = new GameManager();
-        return manager;
     }
 
     public void hide(GamePlayer p){

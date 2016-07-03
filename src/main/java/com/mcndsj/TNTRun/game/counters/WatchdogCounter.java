@@ -2,12 +2,7 @@ package com.mcndsj.TNTRun.game.counters;
 
 import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.Game;
-import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * The watch dog is used for monitoring all games that in errors, such ones have 0 player or so on.
@@ -24,11 +19,6 @@ public class WatchdogCounter extends BukkitRunnable {
     private long lastUpdateMillis = 0;
     private HungryProcedure onHungry = () -> {};
     private boolean alive = false;
-
-    @FunctionalInterface
-    public interface HungryProcedure {
-        void onHungry();
-    }
 
     public WatchdogCounter(Game game, HungryProcedure procedure){
         this.game = game;
@@ -55,6 +45,11 @@ public class WatchdogCounter extends BukkitRunnable {
 
     public Game getGame() {
         return game;
+    }
+
+    @FunctionalInterface
+    public interface HungryProcedure {
+        void onHungry();
     }
 
 }

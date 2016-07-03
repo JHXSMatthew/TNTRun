@@ -1,6 +1,5 @@
 package com.mcndsj.TNTRun.listeners;
 
-import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.config.Messages;
 import com.mcndsj.TNTRun.game.Game;
@@ -8,7 +7,6 @@ import com.mcndsj.TNTRun.game.GamePlayer;
 import com.mcndsj.TNTRun.game.GameState;
 import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,7 +17,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.scheduler.BukkitRunnable;
 
 
 public class PlayerListener implements Listener{
@@ -41,7 +38,7 @@ public class PlayerListener implements Listener{
     @EventHandler
     public void onDamage(EntityDamageEvent evt){
         if(evt.getCause() == EntityDamageEvent.DamageCause.VOID && evt.getEntity() instanceof Player){
-            Game g = PlayerManager.get().getControlPlayer(((Player)evt.getEntity()).getName()).getGame();
+            Game g = PlayerManager.get().getControlPlayer(evt.getEntity().getName()).getGame();
             if(g != null && g.getGameState() == GameState.inGaming){
                 g.onVoidDamage((Player) evt.getEntity());
             }

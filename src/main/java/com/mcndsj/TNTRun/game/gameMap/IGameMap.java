@@ -1,6 +1,5 @@
 package com.mcndsj.TNTRun.game.gameMap;
 
-import com.mcndsj.TNTRun.game.Game;
 import org.bukkit.Location;
 import org.bukkit.World;
 

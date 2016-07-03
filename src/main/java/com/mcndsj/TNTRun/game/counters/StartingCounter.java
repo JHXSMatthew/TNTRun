@@ -4,7 +4,6 @@ import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GameState;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
