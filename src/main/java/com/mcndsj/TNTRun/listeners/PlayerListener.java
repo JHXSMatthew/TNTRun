@@ -37,7 +37,7 @@ public class PlayerListener implements Listener{
 
     @EventHandler
     public void onDamage(EntityDamageEvent evt){
-        if(evt.getCause() == EntityDamageEvent.DamageCause.VOID && evt.getEntity() instanceof Player){
+        if (/*evt.getCause() == EntityDamageEvent.DamageCause.VOID && */evt.getEntity() instanceof Player) {
             Game g = PlayerManager.get().getControlPlayer(evt.getEntity().getName()).getGame();
             if(g != null && g.getGameState() == GameState.inGaming){
                 g.onVoidDamage((Player) evt.getEntity());

@@ -29,11 +29,11 @@ public class StartingCounter extends BukkitRunnable {
     public void run() {
         current --;
         if(current == 0){
-            Core.get().getLogger().info("Game " +this.game.toString()+" started by countdown to 0.");
+            Core.get().getLogger().info("[" + this.game.toString() + "] Game started by countdown to 0.");
             game.switchState(GameState.inGaming);
         }else{
             if(game.getInGame().size() < Config.playerPerGame/2){
-                Core.get().getLogger().info("Game " +this.game.toString()+" switched to lobby, waiting for players to loin.");
+                Core.get().getLogger().info("[" + this.game.toString() + "] Game switched to lobby, waiting for players to loin.");
                 game.switchState(GameState.lobby);
                 game.sendMessage(ChatColor.RED + "人数不足,请等待更多玩家加入!");
             }

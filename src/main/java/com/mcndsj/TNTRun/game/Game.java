@@ -9,8 +9,11 @@ import com.mcndsj.TNTRun.game.counters.StartingCounter;
 import com.mcndsj.TNTRun.game.counters.WatchdogCounter;
 import com.mcndsj.TNTRun.game.gameMap.IGameMap;
 import com.mcndsj.TNTRun.manager.PlayerManager;
-import org.bukkit.*;
 import lombok.Getter;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -33,7 +36,7 @@ public class Game implements IReceiver{
     private GamePlayer winner;
     // Watch dog for killing this game
     private WatchdogCounter watchdog = new WatchdogCounter(this, () -> {
-        Core.get().getLogger().info("Game " +this.toString()+" ended in a gentle bite of watch dog.");
+        Core.get().getLogger().info("[" + this.toString() + "] Game ended in a gentle bite of watch dog.");
         switchState(GameState.end);
     });
 
@@ -42,7 +45,7 @@ public class Game implements IReceiver{
         this.id = id;
         this.map = map;
         map.load();
-        Core.get().getLogger().info("Game " +this.toString()+" created.");
+        Core.get().getLogger().info("[" + this.toString() + "] Game created.");
         switchState(GameState.lobby);
     }
 
@@ -58,11 +61,11 @@ public class Game implements IReceiver{
         gp.setPostJoin();
         show(gp);
         p.teleport(map.getLobby());
-        sendMessage(ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + " ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
+        sendMessage(ChatColor.GRAY + "玩家 " + gp.getName() + " 加入了游戏!" + ChatColor.GREEN + " (" + inGame.size() + "/" + Config.playerPerGame + ")");
 
-        Core.get().getLogger().info("Game " +this.toString()+" have a new gamer: "+gp.getName()+" ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")");
+        Core.get().getLogger().info("[" + this.toString() + "] " + gp.getName() + " joined the game. (" + inGame.size() + "/" + Config.playerPerGame + ")");
         if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) {// pre-condition check
-            Core.get().getLogger().info("Game " +this.toString()+" is time to start.");
+            Core.get().getLogger().info("[" + this.toString() + "] It's time to start the game.");
             switchState(GameState.starting);
         }
 
@@ -76,7 +79,7 @@ public class Game implements IReceiver{
         inGame.remove(gp);
         gp.setGame(null);
         sendMessage(  ChatColor.GRAY  + "玩家 "+gp.getName() +" 离开了游戏!" );
-        Core.get().getLogger().info("Game "+this.toString()+": Player "+p.getName()+" left the game.");
+        Core.get().getLogger().info("[" + this.toString() + "] " + p.getName() + " left the game. (" + inGame.size() + "/" + Config.playerPerGame + ")");
         gp.sendToLobby();
         gp.get().setGameMode(GameMode.SPECTATOR);
         checkWinning();
@@ -84,12 +87,13 @@ public class Game implements IReceiver{
     }
 
     private void checkWinning(){
-        if(inGame.size() == 1 && gameState == GameState.inGaming){
+        if (inGame.size() - deathTime.size() == 1 && gameState == GameState.inGaming) {
             //(only 1 survivor)
+            inGame.forEach((gp) -> deathTime.putIfAbsent(gp, System.currentTimeMillis()));
             List<Map.Entry<GamePlayer, Long>> deathTimeEntries = new ArrayList<>(deathTime.entrySet());
-            Collections.sort(deathTimeEntries, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+            Collections.sort(deathTimeEntries, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
             winner = deathTimeEntries.get(0).getKey();  //// TODO: 2016/7/3 [VERIFY]
-            Core.get().getLogger().info("Game " +this.toString()+" ended. Winner: "+winner.getName());
+            Core.get().getLogger().info("[" + this.toString() + "] Game ended. Winner: " + winner.getName());
             switchState(GameState.end);
             return;
         }
@@ -115,6 +119,7 @@ public class Game implements IReceiver{
             gp.sendMessage(" 你死了..没关系,再来一局一定能赢!");
             sendMessage(ChatColor.RED + " 玩家 " + ChatColor.GREEN + gp.getName() + ChatColor.RED +  " 已死亡. 当前剩余玩家数:" +  ChatColor.GREEN + getSurvivorCount());
             sendTitle(ChatColor.RED + "已死亡", ChatColor.RED + "You Die");
+            Core.get().getLogger().info("[" + this.toString() + "] " + gp.getName() + " died in scream to void.");
             gp.teleport(map.getSpawn());
             GamePlayer ggp  = PlayerManager.get().getControlPlayer(gp.getName());
             deathTime.put(ggp, System.currentTimeMillis());
@@ -168,7 +173,7 @@ public class Game implements IReceiver{
                 this.gameState = GameState.inGaming;
                 setPreGameStart();
                 currentCounter = new InGameCounter(this);
-                watchdog.summon();
+                getWatchdog().summon();
                 break;
             case end:
                 this.gameState = GameState.end;
@@ -177,6 +182,7 @@ public class Game implements IReceiver{
                 if(winner == null) break; //There must be some error occurred.
                 winner.get().setAllowFlight(true);
                 winner.get().setFlying(true);
+                getWatchdog().reset();
                 currentCounter = new EndGameCounter(this);
                 //TODO: give coins
                 //precess win stuff

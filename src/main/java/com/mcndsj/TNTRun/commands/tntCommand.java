@@ -76,7 +76,7 @@ public class tntCommand implements CommandExecutor {
             case "start":
                 Game game = PlayerManager.get().getControlPlayer(commandSender.getName()).getGame();
                 game.switchState(GameState.starting);
-                Core.get().getLogger().info("Game " + game.toString() + " switched to starting due to command.");
+                Core.get().getLogger().info("[" + game.toString() + "] Game switched to starting due to command.");
                 break;
             default:
                 showHelp(commandSender);

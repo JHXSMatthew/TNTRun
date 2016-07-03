@@ -28,12 +28,18 @@ public class WatchdogCounter extends BukkitRunnable {
 
     public final void feed() {
         lastUpdateMillis = System.currentTimeMillis();
+        Core.get().getLogger().info("[" + getGame().toString() + "][WDT] Watchdog fed! Alive: " + alive + " Now: " + lastUpdateMillis);
     }
 
     // 决定就是你了，出来吧，看门狗
     public final void summon() {
         this.feed();
         this.alive = true;
+        Core.get().getLogger().info("[" + getGame().toString() + "][WDT] Watchdog summoned! Now: " + lastUpdateMillis);
+    }
+
+    public final void reset() {
+        this.alive = false;
     }
 
     @Override
