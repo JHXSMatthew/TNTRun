@@ -17,9 +17,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class EndGameCounter extends BukkitRunnable {
 
 
-    private static int maxCount = 31;
+    private static final int maxCount = 31;
     private int current = 0;
-    Game game;
+    private Game game;
 
     public EndGameCounter(Game game){
         current = maxCount;
@@ -42,5 +42,7 @@ public class EndGameCounter extends BukkitRunnable {
         }
 
         game.sendActionBar(ChatColor.GREEN + "你将在 " + current+ " 秒内被传送回大厅");
+
+        game.getWatchdog().feed(); // 喂狗
     }
 }

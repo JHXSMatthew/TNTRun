@@ -6,6 +6,7 @@ import com.mcndsj.TNTRun.game.UsedI.IReceiver;
 import com.mcndsj.TNTRun.game.counters.EndGameCounter;
 import com.mcndsj.TNTRun.game.counters.InGameCounter;
 import com.mcndsj.TNTRun.game.counters.StartingCounter;
+import com.mcndsj.TNTRun.game.counters.WatchdogCounter;
 import com.mcndsj.TNTRun.game.gameMap.IGameMap;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import org.bukkit.*;
@@ -13,8 +14,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Matthew on 19/06/2016.
@@ -24,17 +24,25 @@ public class Game implements IReceiver{
 
 
     private int id;
-    private List<GamePlayer> inGame = new ArrayList<GamePlayer>();
+    private List<GamePlayer> inGame = new ArrayList<>();
+    private Map<GamePlayer, Long> deathTime = new HashMap<>();
     private GameState gameState = null;
     private IGameMap map;
     private BukkitRunnable currentCounter;
-
+    // Store this guy, or "time swift" will cause error. That means, if 2 guys die at almost same time, no winner is at present.
+    private GamePlayer winner;
+    // Watch dog for killing this game
+    private WatchdogCounter watchdog = new WatchdogCounter(this, () -> {
+        Core.get().getLogger().info("Game " +this.toString()+" ended in a gentle bite of watch dog.");
+        switchState(GameState.end);
+    });
 
     public Game(IGameMap map, int id){
         //load map
         this.id = id;
         this.map = map;
         map.load();
+        Core.get().getLogger().info("Game " +this.toString()+" created.");
         switchState(GameState.lobby);
     }
 
@@ -51,8 +59,12 @@ public class Game implements IReceiver{
         show(gp);
         p.teleport(map.getLobby());
         sendMessage(ChatColor.GRAY  + "玩家 "+gp.getName() +" 加入了游戏!" + ChatColor.GREEN + " ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")" );
-        if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) // pre-condition check
+
+        Core.get().getLogger().info("Game " +this.toString()+" have a new gamer: "+gp.getName()+" ("+inGame.size() +"/"+ Bukkit.getMaxPlayers()+")");
+        if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) {// pre-condition check
+            Core.get().getLogger().info("Game " +this.toString()+" is time to start.");
             switchState(GameState.starting);
+        }
 
     }
 
@@ -64,18 +76,28 @@ public class Game implements IReceiver{
         inGame.remove(gp);
         gp.setGame(null);
         sendMessage(  ChatColor.GRAY  + "玩家 "+gp.getName() +" 离开了游戏!" );
+        Core.get().getLogger().info("Game "+this.toString()+": Player "+p.getName()+" left the game.");
         gp.sendToLobby();
         gp.get().setGameMode(GameMode.SPECTATOR);
         checkWinning();
         hide(gp);
     }
 
-    public void checkWinning(){
+    private void checkWinning(){
         if(inGame.size() == 1 && gameState == GameState.inGaming){
+            //(only 1 survivor)
+            List<Map.Entry<GamePlayer, Long>> deathTimeEntries = new ArrayList<>(deathTime.entrySet());
+            Collections.sort(deathTimeEntries, (o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+            winner = deathTimeEntries.get(0).getKey();  //// TODO: 2016/7/3 [VERIFY]
+            Core.get().getLogger().info("Game " +this.toString()+" ended. Winner: "+winner.getName());
             switchState(GameState.end);
             return;
         }
-
+        if (inGame.size() == 0) {
+            // must be something error occurred, nobody in this game
+            switchState(GameState.end);
+            return;
+        }
         byte b = 0;
         for(GamePlayer gp : inGame){
             if(gp.get().getGameMode() != GameMode.SPECTATOR){
@@ -91,9 +113,13 @@ public class Game implements IReceiver{
         if(gameState == GameState.inGaming){
             gp.setGameMode(GameMode.SPECTATOR);
             gp.sendMessage(" 你死了..没关系,再来一局一定能赢!");
-            sendMessage(ChatColor.RED + " 玩家 " + ChatColor.GREEN + gp.getName() + ChatColor.RED +  " 已死亡. 当前剩余玩家数:" +  ChatColor.GREEN + getSurvivals());
+            sendMessage(ChatColor.RED + " 玩家 " + ChatColor.GREEN + gp.getName() + ChatColor.RED +  " 已死亡. 当前剩余玩家数:" +  ChatColor.GREEN + getSurvivorCount());
             sendTitle(ChatColor.RED + "已死亡", ChatColor.RED + "You Die");
             gp.teleport(map.getSpawn());
+            GamePlayer ggp  = PlayerManager.get().getControlPlayer(gp.getName());
+            deathTime.put(ggp, System.currentTimeMillis());
+            //Victory Judge
+            checkWinning();
         }else if(gameState == GameState.end){
             gp.teleport(map.getSpawn());
             gp.setGameMode(GameMode.SPECTATOR);
@@ -102,7 +128,7 @@ public class Game implements IReceiver{
         }
     }
 
-    private int getSurvivals(){
+    private int getSurvivorCount(){
         int count = 0;
         for(GamePlayer gp : inGame){
             if(gp.get().getGameMode() != GameMode.SPECTATOR){
@@ -116,17 +142,13 @@ public class Game implements IReceiver{
     private void cancelTask(){
         try{
             currentCounter.cancel();
-        }catch(Exception e){
-
-        }
+        }catch(Exception ignore){}
     }
 
     private void runTask(){
         try{
             currentCounter.runTaskTimer(Core.get(),0,20);
-        }catch(Exception e){
-
-        }
+        }catch(Exception ignore){}
     }
 
 
@@ -146,14 +168,13 @@ public class Game implements IReceiver{
                 this.gameState = GameState.inGaming;
                 setPreGameStart();
                 currentCounter = new InGameCounter(this);
+                watchdog.summon();
                 break;
             case end:
                 this.gameState = GameState.end;
                 sendSound(Sound.WITHER_DEATH);
                 GamePlayer winner = getWinner();
-                if(winner == null){
-                    Bukkit.shutdown();
-                }
+                if(winner == null) break; //There must be some error occurred.
                 winner.get().setAllowFlight(true);
                 winner.get().setFlying(true);
                 currentCounter = new EndGameCounter(this);
@@ -169,15 +190,8 @@ public class Game implements IReceiver{
     }
 
     public GamePlayer getWinner(){
-        for(GamePlayer gp : inGame){
-            if(gp.get().getGameMode() != GameMode.SPECTATOR){
-                return gp;
-            }
-        }
-        return null;
+        return winner;
     }
-
-
 
     public void sendMessage(String message){
         for(GamePlayer gp : inGame){
@@ -243,6 +257,8 @@ public class Game implements IReceiver{
         }
     }
 
-
-
+    @Override
+    public String toString() {
+        return Integer.toHexString(hashCode());
+    }
 }

@@ -1,5 +1,7 @@
 package com.mcndsj.TNTRun.commands;
 
+import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GameState;
 import com.mcndsj.TNTRun.game.gameMap.GameMap;
 import com.mcndsj.TNTRun.manager.GameManager;
@@ -18,8 +20,8 @@ import org.bukkit.entity.Player;
  */
 public class tntCommand implements CommandExecutor {
 
-    GameMap map;
-    boolean count = false;
+    private GameMap map;
+    private boolean count = false;
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if(!commandSender.isOp() || !(commandSender instanceof Player)){
@@ -46,30 +48,41 @@ public class tntCommand implements CommandExecutor {
             commandSender.sendMessage(map.getName());
             return true;
         }
-        if(label.equals("spawn")){
-            map.setSpawn(new LocationFactory(((Player) commandSender).getLocation()));
-            commandSender.sendMessage("spawn done!");
-        }else if(label.equals("loc")){
-            map.addBounds(((Player) commandSender).getLocation());
-            commandSender.sendMessage(String.valueOf(count));
-            count = true;
-        }else if(label.equals("save")){
-            count = false;
-            map.save();
-            map = null;
-            commandSender.sendMessage("success!");
-        }else if(label.equals("world")){
-            if(strings.length < 2){
+        switch (label) {
+            case "spawn":
+                map.setSpawn(new LocationFactory(((Player) commandSender).getLocation()));
+                commandSender.sendMessage("spawn done!");
+                break;
+            case "loc":
+                map.addBounds(((Player) commandSender).getLocation());
+                commandSender.sendMessage(String.valueOf(count));
+                count = true;
+                break;
+            case "save":
+                count = false;
+                map.save();
+                map = null;
+                commandSender.sendMessage("success!");
+                break;
+            case "world":
+                if (strings.length < 2) {
+                    showHelp(commandSender);
+                    return true;
+                }
+                if (Bukkit.getWorld(strings[1]) == null)
+                    Bukkit.createWorld(new WorldCreator(strings[1]));
+                ((Player) commandSender).teleport(Bukkit.getWorld(strings[1]).getSpawnLocation());
+                ((Player) commandSender).setGameMode(GameMode.SPECTATOR);
+                break;
+            case "start":
+                Game game = PlayerManager.get().getControlPlayer(commandSender.getName()).getGame();
+                game.switchState(GameState.starting);
+                Core.get().getLogger().info("Game " + game.toString() + " switched to starting due to command.");
+                break;
+            default:
                 showHelp(commandSender);
-                return true;
-            }
-            if(Bukkit.getWorld(strings[1]) == null)
-                Bukkit.createWorld(new WorldCreator(strings[1]));
-            ((Player) commandSender).teleport(Bukkit.getWorld(strings[1]).getSpawnLocation());
-            ((Player) commandSender).setGameMode(GameMode.SPECTATOR);
-        }else if(label.equals("start")){
-            PlayerManager.get().getControlPlayer(commandSender.getName()).getGame().switchState(GameState.starting);
-        }else showHelp(commandSender);
+                break;
+        }
         return true;
     }
 

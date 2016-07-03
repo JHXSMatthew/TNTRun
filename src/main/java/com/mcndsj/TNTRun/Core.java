@@ -1,6 +1,7 @@
 package com.mcndsj.TNTRun;
 
 import com.mcndsj.TNTRun.commands.tntCommand;
+import com.mcndsj.TNTRun.listeners.BlockListener;
 import com.mcndsj.TNTRun.listeners.PlayerListener;
 import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
@@ -26,6 +27,7 @@ public class Core extends JavaPlugin {
         getServer().getPluginCommand("tnt").setExecutor(new tntCommand());
         getServer().getMessenger().registerOutgoingPluginChannel(this, "LobbyConnect");
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockListener(), this);
 
         //TODO: CALL FUCKING EVENT HERE
     }

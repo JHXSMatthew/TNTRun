@@ -18,12 +18,12 @@ public class InGameCounter extends BukkitRunnable {
 
 
 
-    Game game;
-    List<Location> cache;
+    private Game game;
+    private List<Location> cache;
 
     public InGameCounter(Game game){
         this.game = game;
-        cache = new ArrayList<Location>();
+        cache = new ArrayList<>();
         runTaskTimer(Core.get(),0,20);
 
     }
@@ -52,5 +52,7 @@ public class InGameCounter extends BukkitRunnable {
             }
 
         }
+
+        game.getWatchdog().feed(); // 喂狗
     }
 }
