@@ -3,6 +3,7 @@ package com.mcndsj.TNTRun.game.counters;
 import com.mcndsj.TNTRun.Core;
 import com.mcndsj.TNTRun.game.Game;
 import com.mcndsj.TNTRun.game.GamePlayer;
+import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.utils.FireWorkUlt;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class EndGameCounter extends BukkitRunnable {
 
 
-    private static final int maxCount = 31;
+    private static final int maxCount = 20;
     private int current = 0;
     private Game game;
 
@@ -28,6 +29,7 @@ public class EndGameCounter extends BukkitRunnable {
         current --;
         if(current == 0){
             game.sendToLobby();
+            GameManager.get().dispose(game.getId());
         }else{
             GamePlayer gp  = game.getWinner() ;
             if(gp != null && gp.get() != null && gp.get().isOnline()){

@@ -106,6 +106,7 @@ public class GameMap implements IGameMap{
         ThreadManager.runTask(new Runnable() {
             @Override
             public void run() {
+                System.out.println("Removing world " + worldName);
                 WorldUtils.deleteWorld(worldName);
             }
         });

@@ -8,6 +8,7 @@ import com.mcndsj.TNTRun.game.counters.InGameCounter;
 import com.mcndsj.TNTRun.game.counters.StartingCounter;
 import com.mcndsj.TNTRun.game.counters.WatchdogCounter;
 import com.mcndsj.TNTRun.game.gameMap.IGameMap;
+import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -87,30 +88,33 @@ public class Game implements IReceiver{
     }
 
     private void checkWinning(){
-        if (inGame.size() - deathTime.size() == 1 && gameState == GameState.inGaming) {
-            //(only 1 survivor)
-            inGame.forEach((gp) -> deathTime.putIfAbsent(gp, System.currentTimeMillis()));
-            List<Map.Entry<GamePlayer, Long>> deathTimeEntries = new ArrayList<>(deathTime.entrySet());
-            Collections.sort(deathTimeEntries, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-            winner = deathTimeEntries.get(0).getKey();  //// TODO: 2016/7/3 [VERIFY]
-            Core.get().getLogger().info("[" + this.toString() + "] Game ended. Winner: " + winner.getName());
-            switchState(GameState.end);
-            return;
-        }
-        if (inGame.size() == 0) {
-            // must be something error occurred, nobody in this game
-            switchState(GameState.end);
-            return;
-        }
-        byte b = 0;
-        for(GamePlayer gp : inGame){
-            if(gp.get().getGameMode() != GameMode.SPECTATOR){
-                b++;
+        if(gameState == GameState.inGaming) {
+            if (inGame.size() == 0) {
+                // must be something error occurred, nobody in this game
+                switchState(GameState.end);
+                return;
             }
-        }
-        if(b == 1 && gameState == GameState.inGaming)
-            switchState(GameState.end);
 
+            if (inGame.size() - deathTime.size() == 1) {
+                //(only 1 survivor)
+                inGame.forEach((gp) -> deathTime.putIfAbsent(gp, System.currentTimeMillis()));
+                List<Map.Entry<GamePlayer, Long>> deathTimeEntries = new ArrayList<>(deathTime.entrySet());
+                Collections.sort(deathTimeEntries, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+                winner = deathTimeEntries.get(0).getKey();  //// TODO: 2016/7/3 [VERIFY]
+                Core.get().getLogger().info("[" + this.toString() + "] Game ended. Winner: " + winner.getName());
+                switchState(GameState.end);
+                return;
+            }
+
+            byte b = 0;
+            for (GamePlayer gp : inGame) {
+                if (gp.get().getGameMode() != GameMode.SPECTATOR) {
+                    b++;
+                }
+            }
+            if (b == 1)
+                switchState(GameState.end);
+        }
     }
 
     public void onVoidDamage(Player gp){
@@ -179,11 +183,14 @@ public class Game implements IReceiver{
                 this.gameState = GameState.end;
                 sendSound(Sound.WITHER_DEATH);
                 GamePlayer winner = getWinner();
-                if(winner == null) break; //There must be some error occurred.
-                winner.get().setAllowFlight(true);
-                winner.get().setFlying(true);
-                getWatchdog().reset();
-                currentCounter = new EndGameCounter(this);
+                if(winner != null) { //There must be some error occurred.
+                    winner.get().setAllowFlight(true);
+                    winner.get().setFlying(true);
+                    getWatchdog().reset();
+                    currentCounter = new EndGameCounter(this);
+                }else{
+                    dispose();
+                }
                 //TODO: give coins
                 //precess win stuff
                 break;
@@ -193,6 +200,20 @@ public class Game implements IReceiver{
 
     public void dispose(){
         getMap().unload();
+        try {
+            currentCounter.cancel();
+        }catch (Exception e){
+
+        }
+        try{
+            watchdog.cancel();
+        }catch (Exception e){
+
+        }
+    }
+
+    public boolean isFull(){
+        return inGame.size() >= Config.playerPerGame;
     }
 
     public GamePlayer getWinner(){

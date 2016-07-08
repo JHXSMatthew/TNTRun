@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class StartingCounter extends BukkitRunnable {
 
 
-    private static int maxCount = 31;
+    private static int maxCount = 30;
     private int current = 0;
     private Game game;
 
@@ -32,7 +32,7 @@ public class StartingCounter extends BukkitRunnable {
             Core.get().getLogger().info("[" + this.game.toString() + "] Game started by countdown to 0.");
             game.switchState(GameState.inGaming);
         }else{
-            if(game.getInGame().size() < Config.playerPerGame/2){
+            if(game.getInGame().size() <= Config.playerPerGame/2){
                 Core.get().getLogger().info("[" + this.game.toString() + "] Game switched to lobby, waiting for players to loin.");
                 game.switchState(GameState.lobby);
                 game.sendMessage(ChatColor.RED + "人数不足,请等待更多玩家加入!");

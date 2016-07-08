@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -90,7 +91,7 @@ public class GameManager {
 
     public void gameJoin(Player p) {
         for (Game g : games) {
-            if (g.getGameState() == GameState.lobby) {
+            if ((g.getGameState() == GameState.lobby || g.getGameState() == GameState.starting ) && !g.isFull()) {
                 g.gameJoin(p);
                 return;
             }
@@ -101,6 +102,18 @@ public class GameManager {
     public void dispose(){
         for(Game g : games){
             g.dispose();
+        }
+    }
+
+    public void dispose(int id){
+        Iterator<Game> iterator = games.iterator();
+        while(iterator.hasNext()){
+            Game i = iterator.next();
+            if(i.getId() == id){
+                i.dispose();
+                iterator.remove();
+                break;
+            }
         }
     }
 

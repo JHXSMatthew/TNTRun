@@ -150,7 +150,9 @@ public class GamePlayer implements IReceiver{
     }
 
     public void sendToLobby() {
-        BungeeUtils.sendPlayerTo(player);
+        player.kickPlayer("GameFinished,Kick");
+        //TODO: bungee support
+        //BungeeUtils.sendPlayerTo(player);
     }
 
     public void hide(GamePlayer gp){
