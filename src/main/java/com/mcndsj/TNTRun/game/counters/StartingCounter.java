@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class StartingCounter extends BukkitRunnable {
 
 
-    private static int maxCount = 30;
+    private static int maxCount = 31;
     private int current = 0;
     private Game game;
 
