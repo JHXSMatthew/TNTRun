@@ -8,12 +8,14 @@ import com.mcndsj.TNTRun.game.GameState;
 import com.mcndsj.TNTRun.game.gameMap.DecoratedGameMap;
 import com.mcndsj.TNTRun.game.gameMap.GameMap;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Created by Matthew on 19/06/2016.
@@ -22,7 +24,7 @@ import java.util.List;
 public class GameManager {
 
     private static GameManager manager;
-    private List<Game> games = new ArrayList<>();
+    private List<Game> games = Collections.synchronizedList(new ArrayList<>());
     private List<GameMap> gmap = new ArrayList<>();
 
 
@@ -106,19 +108,31 @@ public class GameManager {
     }
 
     public void dispose(int id){
-        Iterator<Game> iterator = games.iterator();
-        while(iterator.hasNext()){
-            Game i = iterator.next();
-            if(i.getId() == id){
-                i.dispose();
-                iterator.remove();
-                break;
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+                Iterator<Game> iterator = games.iterator();
+                while(iterator.hasNext()){
+                    Game i = iterator.next();
+                    if(i.getId() == id){
+                        i.dispose();
+                        iterator.remove();
+                        break;
+                    }
+                }
             }
-        }
+        }.runTask(Core.get());
+
     }
 
     public void gameQuit(Player p ){
         GamePlayer gp = PlayerManager.get().getControlPlayer(p.getName());
+        if(gp == null){
+            return;
+        }
+        if(gp.getGame() == null){
+            return;
+        }
         gp.getGame().gameQuit(p);
     }
 

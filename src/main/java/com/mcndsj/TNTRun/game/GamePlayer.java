@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import com.mcndsj.TNTRun.Core;
+import com.mcndsj.TNTRun.config.Config;
 import com.mcndsj.TNTRun.game.UsedI.IReceiver;
 import com.mcndsj.TNTRun.utils.BungeeUtils;
 import com.mcndsj.TNTRun.utils.NMSHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 @Getter
@@ -172,6 +174,28 @@ public class GamePlayer implements IReceiver{
     private void show(Player p){
         player.showPlayer(p);
         p.showPlayer(p);
+    }
+
+    public Block getBlockUnderPlayer() {
+        Location location = player.getLocation();
+        Block returnValue = location.getWorld().getBlockAt((int)(location.getX() + Config.player_bound) ,location.getBlockY() - 1 ,(int)(location.getZ() -Config.player_bound));
+        if (returnValue.getType() != Material.AIR) {
+            return returnValue;
+        }
+        returnValue = location.getWorld().getBlockAt((int)(location.getX() - Config.player_bound) ,location.getBlockY() - 1 ,(int)(location.getZ() +Config.player_bound));
+
+        if (returnValue.getType() != Material.AIR) {
+            return returnValue;
+        }
+        returnValue = location.getWorld().getBlockAt((int)(location.getX() + Config.player_bound) ,location.getBlockY() - 1 ,(int)(location.getZ() +Config.player_bound));
+        if (returnValue.getType() != Material.AIR) {
+            return returnValue;
+        }
+        returnValue = location.getWorld().getBlockAt((int)(location.getX() - Config.player_bound) ,location.getBlockY() - 1,(int)(location.getZ() -Config.player_bound));
+        if (returnValue.getType() != Material.AIR) {
+            return returnValue;
+        }
+        return null;
     }
 
 }

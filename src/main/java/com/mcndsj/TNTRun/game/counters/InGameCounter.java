@@ -19,11 +19,12 @@ public class InGameCounter extends BukkitRunnable {
 
     private Game game;
     private List<Location> cache;
+    private byte countDown = 5 * 20/4;
 
     public InGameCounter(Game game) {
         this.game = game;
         cache = new ArrayList<>();
-        runTaskTimer(Core.get(), 0, 10);
+        runTaskTimer(Core.get(), 0, 4);
 
     }
 
@@ -45,6 +46,7 @@ public class InGameCounter extends BukkitRunnable {
                 game.onVoidDamage(gp.get());
                 continue;
             }
+            /*
             Location l = gp.get().getLocation().clone().add(0, -1, 0);
             List<Location> list = new ArrayList<>();
             double shiftX = Math.abs(l.getX() - l.getBlockX());
@@ -58,6 +60,18 @@ public class InGameCounter extends BukkitRunnable {
             list.forEach((e) -> {
                 if (e.getBlock().getType() != Material.AIR) cache.add(e);
             });
+            */
+            Block b = gp.getBlockUnderPlayer();
+            if(b == null){
+                b = gp.get().getLocation().clone().add(0, -1, 0).getBlock();
+            }
+            if(b.getType() == Material.WATER){
+                game.onVoidDamage(gp.get());
+                continue;
+            }
+            if(b.getType() != Material.AIR){
+                cache.add(b.getLocation());
+            }
         }
 
     }

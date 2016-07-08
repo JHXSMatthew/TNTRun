@@ -28,7 +28,7 @@ public class Game implements IReceiver{
 
 
     private int id;
-    private List<GamePlayer> inGame = new ArrayList<>();
+    private List<GamePlayer> inGame = Collections.synchronizedList(new ArrayList<>());
     private Map<GamePlayer, Long> deathTime = new HashMap<>();
     private GameState gameState = null;
     private IGameMap map;
@@ -199,6 +199,11 @@ public class Game implements IReceiver{
     }
 
     public void dispose(){
+        GamePlayer[] gp = inGame.toArray(new GamePlayer[inGame.size()]);
+        for(int i = 0 ; i < gp.length ; i ++){
+            gameQuit(gp[i].get());
+        }
+
         getMap().unload();
         try {
             currentCounter.cancel();
@@ -266,6 +271,7 @@ public class Game implements IReceiver{
 
     public void sendToLobby() {
         for(GamePlayer gp : inGame){
+            System.out.println(gp.get().getName());
             gp.sendToLobby();
         }
     }
