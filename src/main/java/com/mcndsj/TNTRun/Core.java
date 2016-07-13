@@ -23,7 +23,7 @@ public class Core extends JavaPlugin {
     public void onEnable(){
         instance = this;
         saveDefaultConfig();
-
+        setupChat();
         getServer().getPluginCommand("tnt").setExecutor(new tntCommand());
         getServer().getMessenger().registerOutgoingPluginChannel(this, "LobbyConnect");
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);

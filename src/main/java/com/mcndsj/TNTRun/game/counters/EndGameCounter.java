@@ -12,7 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * Created by Matthew on 19/06/2016.
  */
-public class EndGameCounter extends BukkitRunnable {
+public class EndGameCounter extends BukkitRunnable implements TimeGetable{
 
 
     private static final int maxCount = 10;
@@ -23,6 +23,7 @@ public class EndGameCounter extends BukkitRunnable {
         current = maxCount;
         this.game = game;
         runTaskTimer(Core.get(),0,20);
+
     }
 
 
@@ -48,5 +49,10 @@ public class EndGameCounter extends BukkitRunnable {
 
         game.sendActionBar(ChatColor.GREEN + "你将在 " + current+ " 秒内被传送回大厅");
 
+    }
+
+    @Override
+    public int getTime() {
+        return current;
     }
 }

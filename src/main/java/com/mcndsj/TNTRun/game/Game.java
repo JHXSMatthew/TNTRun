@@ -8,6 +8,9 @@ import com.mcndsj.TNTRun.game.counters.InGameCounter;
 import com.mcndsj.TNTRun.game.counters.StartingCounter;
 import com.mcndsj.TNTRun.game.counters.WatchdogCounter;
 import com.mcndsj.TNTRun.game.gameMap.IGameMap;
+import com.mcndsj.TNTRun.game.scoreboard.GameBoard;
+import com.mcndsj.TNTRun.game.scoreboard.IBoard;
+import com.mcndsj.TNTRun.game.scoreboard.LobbyBoard;
 import com.mcndsj.TNTRun.manager.GameManager;
 import com.mcndsj.TNTRun.manager.PlayerManager;
 import lombok.Getter;
@@ -41,12 +44,15 @@ public class Game implements IReceiver{
         switchState(GameState.end);
     });
 
+    private IBoard board;
+
     public Game(IGameMap map, int id){
         //load map
         this.id = id;
         this.map = map;
         map.load();
         Core.get().getLogger().info("[" + this.toString() + "] Game created.");
+        board = new LobbyBoard(this);
         switchState(GameState.lobby);
     }
 
@@ -64,6 +70,9 @@ public class Game implements IReceiver{
         p.teleport(map.getLobby());
         sendMessage(ChatColor.GRAY + "玩家 " + gp.getName() + " 加入了游戏!" + ChatColor.GREEN + " (" + inGame.size() + "/" + Config.playerPerGame + ")");
 
+        board.addPlayer(gp);
+        board.updateCount();
+
         Core.get().getLogger().info("[" + this.toString() + "] " + gp.getName() + " joined the game. (" + inGame.size() + "/" + Config.playerPerGame + ")");
         if(inGame.size() == Config.playerPerGame && gameState == GameState.lobby && inGame.size() != 1) {// pre-condition check
             Core.get().getLogger().info("[" + this.toString() + "] It's time to start the game.");
@@ -72,12 +81,19 @@ public class Game implements IReceiver{
 
     }
 
+    public IBoard getBoard(){
+        return board;
+    }
+
     public void gameQuit(Player p){
         GamePlayer gp  = PlayerManager.get().getControlPlayer(p.getName());
         if(gp == null){
             return;
         }
         inGame.remove(gp);
+        board.removePlayer(gp);
+        board.updateCount();
+
         gp.setGame(null);
         sendMessage(  ChatColor.GRAY  + "玩家 "+gp.getName() +" 离开了游戏!" );
         Core.get().getLogger().info("[" + this.toString() + "] " + p.getName() + " left the game. (" + inGame.size() + "/" + Config.playerPerGame + ")");
@@ -117,6 +133,15 @@ public class Game implements IReceiver{
         }
     }
 
+    public int getLivePlayerCount(){
+        int i = 0;
+        for(GamePlayer gp : inGame){
+            if(gp.get().getGameMode().equals(GameMode.SPECTATOR)) continue;
+            i++;
+        }
+        return i;
+    }
+
     public void onVoidDamage(Player gp){
         if(gameState == GameState.inGaming){
             gp.setGameMode(GameMode.SPECTATOR);
@@ -127,6 +152,7 @@ public class Game implements IReceiver{
             gp.teleport(map.getSpawn());
             GamePlayer ggp  = PlayerManager.get().getControlPlayer(gp.getName());
             deathTime.put(ggp, System.currentTimeMillis());
+            board.updateCount();
             //Victory Judge
             checkWinning();
         }else if(gameState == GameState.end){
@@ -178,6 +204,8 @@ public class Game implements IReceiver{
                 setPreGameStart();
                 currentCounter = new InGameCounter(this);
                 getWatchdog().summon();
+                board.dispose();
+                board = new GameBoard(this);
                 break;
             case end:
                 this.gameState = GameState.end;
@@ -195,6 +223,9 @@ public class Game implements IReceiver{
                 //precess win stuff
                 break;
 
+        }
+        if(board != null){
+            board.updateScoreboard(state);
         }
     }
 

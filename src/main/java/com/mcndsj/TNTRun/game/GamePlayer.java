@@ -152,6 +152,8 @@ public class GamePlayer implements IReceiver{
     }
 
     public void sendToLobby() {
+        player.setGameMode(GameMode.SPECTATOR);
+        player.teleport(Bukkit.getWorld("lobby").getSpawnLocation());
         player.kickPlayer("GameFinished,Kick");
         //TODO: bungee support
         //BungeeUtils.sendPlayerTo(player);
